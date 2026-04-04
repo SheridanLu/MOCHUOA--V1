@@ -179,3 +179,58 @@
 
 ### 下一步工作
 - Phase 2B: 施工进度/变更/财务管理
+
+## 2026-04-04 - Phase 2.2 实现
+
+### 完成内容
+
+#### 施工进度模块 (Features 149-162)
+- 后端: BizProgressPlan/Task/Deviation 实体, 3个Mapper, PlanCreateDTO/TaskCreateDTO/ProgressUpdateDTO, PlanVO/TaskVO/DeviationVO
+- BizProgressServiceImpl - 进度全生命周期:
+  - 进度计划创建与审批
+  - 任务管理 (WBS结构, 父子任务层级, 里程碑标记)
+  - 甘特图数据查询 (按计划获取任务树)
+  - 进度更新 (单个/批量, 任务状态自动计算)
+  - 偏差扫描与分析 (自动检测进度偏差, 提前/延期分类)
+- BizProgressController - 9个REST端点
+
+#### 变更管理模块 (Features 163-170)
+- 后端: BizChangeSiteVisa/Owner/LaborVisa 实体, 3个Mapper, SiteVisaCreateDTO/OwnerChangeCreateDTO/LaborVisaCreateDTO/ChangeQueryDTO, SiteVisaVO/OwnerChangeVO/LaborVisaVO/ChangeLedgerVO
+- BizChangeServiceImpl - 变更全模块:
+  - 现场签证 (自动编号 VS+YYMMDD+3位, 审批/驳回)
+  - 业主变更 (自动编号 CH+YYMMDD+3位, 金额变更追踪)
+  - 用工签证 (工人人数+金额, 审批流)
+  - 变更台账统一查询 (分页聚合三类变更)
+- BizChangeController - 10个REST端点
+
+#### 财务管理模块 (Features 171-185)
+- 后端: BizFinanceIncomeSplit/Reconciliation/Payment/Invoice/Cost 实体, 5个Mapper, IncomeSplitCreateDTO/PaymentCreateDTO/InvoiceCreateDTO/ReceiptDTO/FinanceQueryDTO, IncomeSplitVO/ReconciliationVO/PaymentVO/InvoiceVO/CostVO
+- BizFinanceServiceImpl - 财务全模块:
+  - 收入分解 (分期确认, 合同金额校验±0.01容差, 审批流)
+  - 对账管理 (月度自动生成对账单 DZ+YYMM+2位, 差异计算)
+  - 付款管理 (材料/人工分类, 审批+标记已付, 编号 MP/PA+YYMMDD+3位)
+  - 收款登记 (自动编号 SK+YYMMDD+3位, 更新合同已收金额)
+  - 发票管理 (专票/普票/其他, 360天到期预警)
+  - 成本汇总 (10类成本聚合, 按项目/期间)
+- BizFinanceController - 16个REST端点
+
+#### 前端
+- 3个API模块: progress.js (9接口), change.js (10接口), finance.js (16接口)
+- ProgressPage.vue (进度计划/任务管理/偏差分析 三Tab页, 含甘特图数据展示)
+- ChangePage.vue (现场签证/业主变更/用工签证 三Tab页, 变更台账统一展示)
+- FinancePage.vue (收入分解/付款/对账/发票/成本/收款 六Tab页)
+- 路由新增: /progress, /changes, /finance
+- MainLayout侧边栏新增: 施工进度(DataLine), 变更管理(Switch), 财务管理(Money)
+
+#### 数据库
+- V3__phase2_2_additions.sql: 11张新表 + biz_contract增加received_amount字段
+- BizNoGenerator: 新增generateSiteVisaNo/generateOwnerChangeNo/generateReceiptNo
+
+### 文件统计
+- 新增后端文件: ~55个 (entity/mapper/dto/vo/service/controller)
+- 新增前端文件: 6个 (3 API + 3 页面)
+- 修改文件: 3个 (router, MainLayout, BizNoGenerator)
+- 新增SQL: V3__phase2_2_additions.sql
+
+### 下一步工作
+- Phase 3: 竣工管理/通知系统/案例展示

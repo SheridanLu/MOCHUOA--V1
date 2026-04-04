@@ -44,4 +44,7 @@ public class BizNoGenerator {
     public String generatePurchaseListNo() { return generate("PL", "yyMMdd", 2); }
     public String generateReturnNo() { return generate("TK", "yyMMdd", 3); }
     public String generateReimburseNo() { return generate("BX", "yyMMdd", 3); }
+    public String generateSiteVisaNo() { return generate("VS", "yyMMdd", 3); }
+    public String generateOwnerChangeNo() { return generate("CH", "yyMMdd", 3); }
+    public String generateReceiptNo() { return generate("SK", "yyMMdd", 3); }
 }

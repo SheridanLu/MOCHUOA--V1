@@ -87,6 +87,24 @@ const routes = [
         name: 'HrPage',
         component: () => import('@/views/hr/HrPage.vue'),
         meta: { title: '人力资源', permission: 'hr:view' }
+      },
+      {
+        path: 'progress',
+        name: 'ProgressPage',
+        component: () => import('@/views/progress/ProgressPage.vue'),
+        meta: { title: '施工进度', permission: 'progress:view' }
+      },
+      {
+        path: 'changes',
+        name: 'ChangePage',
+        component: () => import('@/views/change/ChangePage.vue'),
+        meta: { title: '变更管理', permission: 'change:view' }
+      },
+      {
+        path: 'finance',
+        name: 'FinancePage',
+        component: () => import('@/views/finance/FinancePage.vue'),
+        meta: { title: '财务管理', permission: 'finance:view' }
       }
     ]
   },
