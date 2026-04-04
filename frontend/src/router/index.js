@@ -39,6 +39,36 @@ const routes = [
         name: 'DeptTree',
         component: () => import('@/views/admin/DeptTree.vue'),
         meta: { title: '部门管理', permission: 'dept:create' }
+      },
+      {
+        path: 'projects',
+        name: 'ProjectList',
+        component: () => import('@/views/project/ProjectList.vue'),
+        meta: { title: '项目管理', permission: 'project:view' }
+      },
+      {
+        path: 'contracts',
+        name: 'ContractList',
+        component: () => import('@/views/contract/ContractList.vue'),
+        meta: { title: '合同管理', permission: 'contract:view' }
+      },
+      {
+        path: 'contract-templates',
+        name: 'TemplateList',
+        component: () => import('@/views/contract/TemplateList.vue'),
+        meta: { title: '合同模板', permission: 'contract:view' }
+      },
+      {
+        path: 'suppliers',
+        name: 'SupplierList',
+        component: () => import('@/views/supplier/SupplierList.vue'),
+        meta: { title: '供应商管理', permission: 'supplier:view' }
+      },
+      {
+        path: 'contacts',
+        name: 'ContactList',
+        component: () => import('@/views/contact/ContactList.vue'),
+        meta: { title: '通讯录', permission: 'contact:view' }
       }
     ]
   },

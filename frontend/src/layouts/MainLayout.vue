@@ -25,6 +25,26 @@
           <el-menu-item index="/admin/roles" v-if="userStore.hasPermission('role:create')">角色管理</el-menu-item>
           <el-menu-item index="/admin/departments" v-if="userStore.hasPermission('dept:create')">部门管理</el-menu-item>
         </el-sub-menu>
+        <el-menu-item index="/projects" v-if="userStore.hasPermission('project:view')">
+          <el-icon><Folder /></el-icon>
+          <span>项目管理</span>
+        </el-menu-item>
+        <el-sub-menu index="/contract-group" v-if="userStore.hasPermission('contract:view')">
+          <template #title>
+            <el-icon><Document /></el-icon>
+            <span>合同管理</span>
+          </template>
+          <el-menu-item index="/contracts">合同列表</el-menu-item>
+          <el-menu-item index="/contract-templates">合同模板</el-menu-item>
+        </el-sub-menu>
+        <el-menu-item index="/suppliers" v-if="userStore.hasPermission('supplier:view')">
+          <el-icon><OfficeBuilding /></el-icon>
+          <span>供应商管理</span>
+        </el-menu-item>
+        <el-menu-item index="/contacts" v-if="userStore.hasPermission('contact:view')">
+          <el-icon><User /></el-icon>
+          <span>通讯录</span>
+        </el-menu-item>
       </el-menu>
     </el-aside>
     <el-container>
@@ -59,6 +79,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessageBox } from 'element-plus'
+import { HomeFilled, Setting, Fold, Expand, Folder, Document, OfficeBuilding, User } from '@element-plus/icons-vue'
 import { logout as logoutApi } from '@/api/auth'
 
 const router = useRouter()

@@ -23,12 +23,101 @@
 - 创建全量 DDL 脚本 (66张表 + 初始数据)
 - 创建 init.sh 一键启动脚本
 
-### 待生成文件 (后台 Agent 进行中)
-- feature_list.json
-- docs/sql/V1__init_schema.sql
+### 已补充完成
+- feature_list.json (312条功能测试用例)
+- docs/sql/V1__init_schema.sql (66张表 + 种子数据)
+
+## 2026-04-04 - Phase 0 实现
+
+### 完成内容
+- mochu-common: BaseEntity, Constants, 4个枚举, LoginUser/SecurityUtils/BizNoGenerator工具类, MybatisPlusConfig
+- mochu-framework: SecurityConfig(JWT无状态+CORS+BCrypt), JwtUtils, JwtAuthenticationFilter(Redis令牌验证+自动刷新), RedisConfig, AuditLogAspect, DataPermissionInterceptor
+- mochu-system: 完整的用户/角色/权限/部门CRUD (7实体+7DTO+7VO+7Mapper+6Service+6Controller)
+  - AuthService: 二级登录(密码+短信), 账号锁定, JWT令牌管理, 权限Redis缓存, 角色互斥校验
+  - SysUserService: 分页查询/创建/编辑/启停用/重置密码
+  - SysRoleService: 角色CRUD, 权限分配, 互斥校验, 缓存清除
+  - SysDepartmentService: 部门树, 创建/编辑/启停用(含在职员工校验)
+  - SysPermissionService: 全量查询, 按用户ID查权限编码
+  - HomeService: 首页聚合数据(快捷入口+待办+公告)
+- mochu-business: 16个业务实体类(项目/合同/物资/财务/供应商/进度/变更/人事/竣工/公告/案例/采购)
+- 前端API模块: auth/user/role/department/permission/home
+- 前端页面: UserList(完整CRUD+搜索+分页), RoleList(权限树), DeptTree(树形+状态切换)
+- 前端更新: LoginPage接入真实API, MainLayout增加系统管理菜单和退出API, 路由增加admin路由
+
+### Git 提交
+- 254dcae feat: implement Phase 0 system foundation - auth, RBAC, org structure (92 files, +4838 lines)
 
 ### 下一步工作
-- Phase 0: 实现登录认证模块 (JWT + Spring Security)
-- Phase 0: 实现用户管理 CRUD
-- Phase 0: 实现组织架构管理
-- Phase 0: 实现 RBAC 权限模型
+- Phase 1: 实现项目管理模块 (立项/审批/状态机)
+- Phase 1: 实现合同管理模块 (收入/支出/补充协议/模板)
+- Phase 1: 实现供应商管理
+- Phase 1: 实现通讯录模块
+
+## 2026-04-04 - Phase 1 实现
+
+### 完成内容
+
+#### 供应商管理 (Features 100-103)
+- 后端: BizSupplierMapper, SupplierCreateDTO/UpdateDTO/QueryDTO, SupplierVO, BizSupplierService(Impl), BizSupplierController
+  - 供应商列表分页查询 (名称/编码/联系人搜索, 分类/状态筛选)
+  - 新增供应商 (编码唯一性校验, 无需审批)
+  - 编辑供应商信息
+  - 启停用供应商
+  - 获取全部启用供应商列表 (用于合同选择)
+- 前端: supplier.js API, SupplierList.vue 页面 (完整CRUD+搜索+分页+评级)
+
+#### 通讯录模块 (Features 104-108)
+- 后端: BizContact 实体, BizContactMapper, ContactVO, BizContactService(Impl), BizContactController
+  - 按部门查询通讯录 (部门树联动)
+  - 实时搜索 (≥2字符触发)
+  - 手机号脱敏 (GM/HR 可查看完整号码)
+  - 入职同步通讯录 (syncFromUser)
+  - 离职隐藏通讯录 (hideByUser)
+- 前端: contact.js API, ContactList.vue 页面 (左侧部门树+右侧通讯录列表+搜索)
+
+#### 项目管理模块 (Features 61-75, 251-254, 280)
+- 后端: BizProjectPaymentBatch/BizProjectDocument 实体, 3个Mapper, ProjectCreateDTO/UpdateDTO/QueryDTO, ProjectVO (含PaymentBatchVO)
+- BizProjectService(Impl) - 完整项目生命周期:
+  - 实体项目立项 (自动编号 P+YYMMDD+3位, 含税一致性校验)
+  - 虚拟项目立项 (自动编号 V+YYMM+3位, 投入限额, 直接跟踪中)
+  - 提交审批 / 审批通过 / 驳回 (回到草稿, 意见字数校验)
+  - 项目暂停 / 恢复
+  - 项目关闭
+  - 虚拟项目中止
+  - 虚拟转实体项目 (创建新实体项目, 虚拟项目标记已转实体)
+  - 付款批次比例校验 (总和≤100%)
+- BizProjectController - 12个REST端点
+- 前端: project.js API (12个接口), ProjectList.vue 页面 (列表+筛选+创建/编辑弹窗+详情弹窗+审批弹窗+状态操作)
+
+#### 合同管理模块 (Features 76-93, 255-256, 281, 308-309)
+- 后端: BizContractSupplement/BizContractTemplate 实体, 4个Mapper, ContractCreateDTO/QueryDTO/SupplementCreateDTO, ContractVO (含ItemVO/SupplementVO)
+- BizContractService(Impl) - 合同全生命周期:
+  - 收入/支出合同创建 (自动编号 IC/EC, 支出合同物资明细必填校验)
+  - 合同提交审批 (支出合同超量校验, 虚拟项目跳过)
+  - 多级审批 (待审批→财务已审→法务已审→已审批)
+  - 驳回 (回到草稿, 意见≥5字符)
+  - 合同终止
+  - 补充协议签订 (自动编号 BC)
+- BizContractController - 8个REST端点
+- 前端: contract.js API, ContractList.vue 页面 (列表+筛选+创建弹窗含物资明细表格+详情弹窗+审批弹窗+补充协议弹窗)
+
+#### 合同模板模块 (Features 94-99)
+- 后端: TemplateCreateDTO, TemplateVO, BizContractTemplateService(Impl), BizContractTemplateController
+  - 模板创建/编辑 (含变量占位符 ${变量名})
+  - 模板审批流 (草稿→待审批→已审批)
+  - 模板渲染 (变量替换为输入框)
+- 前端: template.js API, TemplateList.vue 页面 (列表+筛选+创建/编辑+预览+审批)
+
+#### 路由与菜单集成
+- 新增6条路由: /projects, /contracts, /contract-templates, /suppliers, /contacts
+- MainLayout 侧边栏新增: 项目管理、合同管理(子菜单)、供应商管理、通讯录 (均含权限控制)
+
+### 文件统计
+- 新增后端文件: 42个 (entity/mapper/dto/vo/service/controller)
+- 新增前端文件: 11个 (API模块 + 页面组件)
+- 修改文件: 2个 (router/index.js, MainLayout.vue)
+
+### 下一步工作
+- Phase 2A: 采购管理模块
+- Phase 2A: 物资管理模块 (入库/出库/库存)
+- Phase 2A: 人力资源模块 (员工/薪资/报销)
