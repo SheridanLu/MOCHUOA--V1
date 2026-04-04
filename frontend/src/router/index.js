@@ -22,7 +22,24 @@ const routes = [
         component: () => import('@/views/home/HomePage.vue'),
         meta: { title: '首页' }
       }
-      // 其他页面路由在各 Phase 中逐步添加
+      {
+        path: 'admin/users',
+        name: 'UserList',
+        component: () => import('@/views/admin/UserList.vue'),
+        meta: { title: '用户管理', permission: 'user:view' }
+      },
+      {
+        path: 'admin/roles',
+        name: 'RoleList',
+        component: () => import('@/views/admin/RoleList.vue'),
+        meta: { title: '角色管理', permission: 'role:create' }
+      },
+      {
+        path: 'admin/departments',
+        name: 'DeptTree',
+        component: () => import('@/views/admin/DeptTree.vue'),
+        meta: { title: '部门管理', permission: 'dept:create' }
+      }
     ]
   },
   {

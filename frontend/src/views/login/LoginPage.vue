@@ -67,6 +67,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
+import { checkAccount as checkAccountApi, loginByPassword as loginByPasswordApi, loginBySms as loginBySmsApi, sendSmsCode as sendSmsCodeApi } from '@/api/auth'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -84,11 +85,18 @@ const checkAccount = async () => {
     ElMessage.warning('请输入用户名或手机号')
     return
   }
-  // TODO: 调用 check-account 接口
-  // 临时逻辑：手机号格式进入验证码登录
-  const isPhone = /^1\d{10}$/.test(account.value)
-  loginType.value = isPhone ? 'sms' : 'password'
-  step.value = 2
+  loading.value = true
+  try {
+    const res = await checkAccountApi({ account: account.value })
+    if (!res.data.exists) {
+      ElMessage.error('账号不存在')
+      return
+    }
+    loginType.value = res.data.loginType
+    step.value = 2
+  } finally {
+    loading.value = false
+  }
 }
 
 const loginByPassword = async () => {
@@ -98,16 +106,21 @@ const loginByPassword = async () => {
   }
   loading.value = true
   try {
-    // TODO: 调用 login-by-password 接口
+    const res = await loginByPasswordApi({ account: account.value, password: password.value })
+    userStore.setToken(res.data.token)
+    userStore.setUserInfo(res.data.userInfo)
+    userStore.setPermissions([...res.data.permissions])
     ElMessage.success('登录成功')
-    router.push('/')
+    const redirect = router.currentRoute.value.query.redirect || '/'
+    router.push(redirect)
   } finally {
     loading.value = false
   }
 }
 
 const sendSms = async () => {
-  // TODO: 调用 send-sms 接口
+  await sendSmsCodeApi(account.value)
+  ElMessage.success('验证码已发送')
   countdown.value = 60
   const timer = setInterval(() => {
     countdown.value--
@@ -122,9 +135,13 @@ const loginBySms = async () => {
   }
   loading.value = true
   try {
-    // TODO: 调用 login-by-sms 接口
+    const res = await loginBySmsApi({ account: account.value, smsCode: smsCode.value })
+    userStore.setToken(res.data.token)
+    userStore.setUserInfo(res.data.userInfo)
+    userStore.setPermissions([...res.data.permissions])
     ElMessage.success('登录成功')
-    router.push('/')
+    const redirect = router.currentRoute.value.query.redirect || '/'
+    router.push(redirect)
   } finally {
     loading.value = false
   }

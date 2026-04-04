@@ -16,7 +16,15 @@
           <el-icon><HomeFilled /></el-icon>
           <span>首页</span>
         </el-menu-item>
-        <!-- 菜单项根据权限动态渲染，各 Phase 逐步添加 -->
+        <el-sub-menu index="/admin" v-if="userStore.hasPermission('user:view') || userStore.hasPermission('role:create') || userStore.hasPermission('dept:create')">
+          <template #title>
+            <el-icon><Setting /></el-icon>
+            <span>系统管理</span>
+          </template>
+          <el-menu-item index="/admin/users" v-if="userStore.hasPermission('user:view')">用户管理</el-menu-item>
+          <el-menu-item index="/admin/roles" v-if="userStore.hasPermission('role:create')">角色管理</el-menu-item>
+          <el-menu-item index="/admin/departments" v-if="userStore.hasPermission('dept:create')">部门管理</el-menu-item>
+        </el-sub-menu>
       </el-menu>
     </el-aside>
     <el-container>
@@ -51,6 +59,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessageBox } from 'element-plus'
+import { logout as logoutApi } from '@/api/auth'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -60,6 +69,7 @@ const handleCommand = (command) => {
   if (command === 'logout') {
     ElMessageBox.confirm('确定要退出登录吗？', '提示', { type: 'warning' })
       .then(() => {
+        logoutApi().catch(() => {})
         userStore.logout()
         router.push('/login')
       })
