@@ -1,0 +1,9 @@
+package com.mochu.business.material.mapper;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.mochu.business.material.entity.BizMaterialReturn;
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+public interface BizMaterialReturnMapper extends BaseMapper<BizMaterialReturn> {
+}

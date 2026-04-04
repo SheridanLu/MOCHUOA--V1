@@ -69,6 +69,24 @@ const routes = [
         name: 'ContactList',
         component: () => import('@/views/contact/ContactList.vue'),
         meta: { title: '通讯录', permission: 'contact:view' }
+      },
+      {
+        path: 'purchases',
+        name: 'PurchaseList',
+        component: () => import('@/views/purchase/PurchaseList.vue'),
+        meta: { title: '采购管理', permission: 'purchase:view' }
+      },
+      {
+        path: 'materials',
+        name: 'MaterialPage',
+        component: () => import('@/views/material/MaterialPage.vue'),
+        meta: { title: '物资管理', permission: 'material:view' }
+      },
+      {
+        path: 'hr',
+        name: 'HrPage',
+        component: () => import('@/views/hr/HrPage.vue'),
+        meta: { title: '人力资源', permission: 'hr:view' }
       }
     ]
   },

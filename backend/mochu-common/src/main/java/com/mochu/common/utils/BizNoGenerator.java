@@ -41,4 +41,7 @@ public class BizNoGenerator {
     public String generateReconciliationNo() { return generate("DZ", "yyMM", 2); }
     public String generateLaborPaymentNo() { return generate("PA", "yyMMdd", 3); }
     public String generateMaterialPaymentNo() { return generate("MP", "yyMMdd", 3); }
+    public String generatePurchaseListNo() { return generate("PL", "yyMMdd", 2); }
+    public String generateReturnNo() { return generate("TK", "yyMMdd", 3); }
+    public String generateReimburseNo() { return generate("BX", "yyMMdd", 3); }
 }

@@ -45,6 +45,18 @@
           <el-icon><User /></el-icon>
           <span>通讯录</span>
         </el-menu-item>
+        <el-menu-item index="/purchases" v-if="userStore.hasPermission('purchase:view')">
+          <el-icon><ShoppingCart /></el-icon>
+          <span>采购管理</span>
+        </el-menu-item>
+        <el-menu-item index="/materials" v-if="userStore.hasPermission('material:view')">
+          <el-icon><Box /></el-icon>
+          <span>物资管理</span>
+        </el-menu-item>
+        <el-menu-item index="/hr" v-if="userStore.hasPermission('hr:view')">
+          <el-icon><Avatar /></el-icon>
+          <span>人力资源</span>
+        </el-menu-item>
       </el-menu>
     </el-aside>
     <el-container>
@@ -79,7 +91,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessageBox } from 'element-plus'
-import { HomeFilled, Setting, Fold, Expand, Folder, Document, OfficeBuilding, User } from '@element-plus/icons-vue'
+import { HomeFilled, Setting, Fold, Expand, Folder, Document, OfficeBuilding, User, ShoppingCart, Box, Avatar } from '@element-plus/icons-vue'
 import { logout as logoutApi } from '@/api/auth'
 
 const router = useRouter()

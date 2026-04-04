@@ -118,6 +118,64 @@
 - 修改文件: 2个 (router/index.js, MainLayout.vue)
 
 ### 下一步工作
-- Phase 2A: 采购管理模块
-- Phase 2A: 物资管理模块 (入库/出库/库存)
-- Phase 2A: 人力资源模块 (员工/薪资/报销)
+- Phase 2B: 施工进度管理
+- Phase 2B: 变更管理
+- Phase 2B: 财务管理
+
+## 2026-04-05 - Phase 2.1 实现
+
+### 完成内容
+
+#### 采购管理模块 (Features 111-120, 300-301)
+- 后端: BizPurchaseItem/BizBenchmarkPrice 实体, 2个Mapper, PurchaseListCreateDTO/QueryDTO/BenchmarkPriceDTO, PurchaseListVO/BenchmarkPriceVO
+- BizPurchaseServiceImpl - 采购全生命周期:
+  - 采购清单创建 (自动编号 PL+YYMMDD+2位, 物资明细必填校验)
+  - 每个项目仅一个有效采购清单 (Feature 115)
+  - 多级审批 (预算员→财务→总经理)
+  - 基准价管理 (手动修改需审批, 合同审批自动更新)
+  - 物资价格历史查询 (Feature 300)
+  - 已审批清单变更流程 (Feature 301)
+- BizPurchaseController - 12个REST端点
+
+#### 物资管理模块 (Features 121-136, 262-265, 302)
+- 后端: BizMaterialInboundItem/Outbound/OutboundItem/Return/ReturnItem 实体, 7个Mapper
+- BizMaterialServiceImpl - 物资全生命周期:
+  - 入库: 合同审批自动生成草稿, 数量不超合同剩余校验, 加权均价计算
+  - 出库: 库存校验, 出库金额=数量×加权均价, 多级审批(PM→采购→财务→GM)
+  - 退料: 4种模式 (现场处置/退厂/入公司仓库/项目间调拨)
+  - 库存查询 (按项目/物资/仓库)
+  - 编号: RK+YYMMDD+3位, CK+YYMMDD+3位, TK+YYMMDD+3位
+- BizMaterialController - 14个REST端点
+
+#### 人力资源模块 (Features 137-148, 272-274)
+- 后端: BizHrPayroll/Reimbursement/Contract/Qualification 实体, 5个Mapper
+- BizHrServiceImpl - HR全模块:
+  - 员工入职 (自动生成工号/系统用户/通讯录同步)
+  - 员工离职 (禁用用户/隐藏通讯录)
+  - 月度薪资生成 + 个税自动计算 (7级超额累进税率)
+  - 薪资调整审批 (财务→总经理)
+  - 6类日常报销 + 4级审批 (主管→财务→出纳确认)
+  - 劳动合同管理 (5种类型, 续签联动, 到期≤30天提醒)
+  - 资质管理 + 到期预警
+  - 报销编号: BX+YYMMDD+3位
+- BizHrController - 20个REST端点
+
+#### 前端
+- 3个API模块: purchase.js, material.js, hr.js
+- PurchaseList.vue (采购清单CRUD+审批+物资明细表格+变更)
+- MaterialPage.vue (入库/出库/退料/库存 四Tab页)
+- HrPage.vue (员工/薪资/报销/合同/资质 五Tab页)
+- 路由新增: /purchases, /materials, /hr
+- MainLayout侧边栏新增: 采购管理(ShoppingCart), 物资管理(Box), 人力资源(Avatar)
+
+#### 数据库
+- V2__phase2_1_additions.sql: biz_benchmark_price表 + biz_material_return表增加字段
+- BizNoGenerator: 新增generatePurchaseListNo/generateReturnNo/generateReimburseNo
+
+### 文件统计
+- 新增后端文件: ~55个
+- 新增前端文件: 6个 (3 API + 3 页面)
+- 修改文件: 4个 (router, MainLayout, BizNoGenerator, claude-progress.txt)
+
+### 下一步工作
+- Phase 2B: 施工进度/变更/财务管理
