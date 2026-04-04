@@ -21,7 +21,7 @@ const routes = [
         name: 'Home',
         component: () => import('@/views/home/HomePage.vue'),
         meta: { title: '首页' }
-      }
+      },
       {
         path: 'admin/users',
         name: 'UserList',
