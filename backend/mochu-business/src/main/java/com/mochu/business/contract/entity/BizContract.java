@@ -18,6 +18,7 @@ public class BizContract extends BaseEntity {
     private Long parentContractId;
     private Long supplierId;
     private BigDecimal amountWithTax;
+    private BigDecimal receivedAmount;
     private BigDecimal taxRate;
     private BigDecimal taxAmount;
     private BigDecimal amountWithoutTax;

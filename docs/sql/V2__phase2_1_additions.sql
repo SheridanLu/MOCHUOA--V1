@@ -22,4 +22,4 @@ CREATE TABLE `biz_benchmark_price` (
 -- Add return_type and target_project_id to material_return table
 ALTER TABLE `biz_material_return` ADD COLUMN `return_type` TINYINT NOT NULL DEFAULT 1 COMMENT '1=on-site, 2=manufacturer, 3=company warehouse, 4=inter-project' AFTER `reason`;
 ALTER TABLE `biz_material_return` ADD COLUMN `target_project_id` BIGINT NULL COMMENT 'Target project for inter-project transfer' AFTER `return_type`;
-ALTER TABLE `biz_material_return` ADD COLUMN `creator_id` BIGINT NULL AFTER `target_project_id`;
+-- NOTE: creator_id already exists in V1__init_schema.sql, no need to add again

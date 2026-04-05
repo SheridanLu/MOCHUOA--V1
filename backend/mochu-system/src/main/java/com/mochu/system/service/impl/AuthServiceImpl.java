@@ -209,4 +209,52 @@ public class AuthServiceImpl implements AuthService {
         loginVO.setPermissions(permCodes);
         return loginVO;
     }
+
+    @Override
+    public LoginVO getCurrentUser() {
+        LoginUser loginUser = SecurityUtils.getLoginUser();
+        if (loginUser == null) {
+            throw new BusinessException(401, "未登录");
+        }
+        SysUser user = userMapper.selectById(loginUser.getUserId());
+        if (user == null || user.getStatus() == 0) {
+            throw new BusinessException(401, "用户不存在或已被禁用");
+        }
+
+        Set<String> permCodes = permissionMapper.selectPermCodesByUserId(user.getId());
+
+        UserVO userVO = new UserVO();
+        userVO.setId(user.getId());
+        userVO.setUsername(user.getUsername());
+        userVO.setRealName(user.getRealName());
+        userVO.setPhone(user.getPhone());
+        userVO.setEmail(user.getEmail());
+        userVO.setAvatar(user.getAvatar());
+        userVO.setDeptId(user.getDeptId());
+        userVO.setStatus(user.getStatus());
+        userVO.setLastLoginAt(user.getLastLoginAt());
+        userVO.setCreatedAt(user.getCreatedAt());
+
+        if (user.getDeptId() != null) {
+            SysDepartment dept = departmentMapper.selectById(user.getDeptId());
+            if (dept != null) userVO.setDeptName(dept.getDeptName());
+        }
+
+        List<SysRole> roles = roleMapper.selectRolesByUserId(user.getId());
+        userVO.setRoles(roles.stream().map(r -> {
+            RoleVO rv = new RoleVO();
+            rv.setId(r.getId());
+            rv.setRoleCode(r.getRoleCode());
+            rv.setRoleName(r.getRoleName());
+            rv.setDescription(r.getDescription());
+            rv.setDataScope(r.getDataScope());
+            rv.setStatus(r.getStatus());
+            return rv;
+        }).collect(Collectors.toList()));
+
+        LoginVO loginVO = new LoginVO();
+        loginVO.setUserInfo(userVO);
+        loginVO.setPermissions(permCodes);
+        return loginVO;
+    }
 }

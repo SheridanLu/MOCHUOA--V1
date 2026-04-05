@@ -24,4 +24,8 @@ public class PageResult<T> implements Serializable {
         this.size = size;
         this.pages = (int) Math.ceil((double) total / size);
     }
+
+    public static <T> PageResult<T> of(List<T> records, long total, int page, int size) {
+        return new PageResult<>(records, total, page, size);
+    }
 }

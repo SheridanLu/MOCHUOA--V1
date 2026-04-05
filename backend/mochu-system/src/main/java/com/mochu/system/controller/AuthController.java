@@ -17,6 +17,11 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @GetMapping("/health")
+    public R<String> health() {
+        return R.ok("UP");
+    }
+
     @PostMapping("/check-account")
     public R<CheckAccountVO> checkAccount(@Valid @RequestBody CheckAccountDTO dto) {
         return R.ok(authService.checkAccount(dto));
@@ -36,6 +41,11 @@ public class AuthController {
     public R<Void> sendSmsCode(@RequestParam String phone) {
         authService.sendSmsCode(phone);
         return R.ok();
+    }
+
+    @GetMapping("/me")
+    public R<LoginVO> getCurrentUser() {
+        return R.ok(authService.getCurrentUser());
     }
 
     @PostMapping("/logout")

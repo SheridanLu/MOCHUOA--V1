@@ -6,6 +6,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public final class SecurityUtils {
     private SecurityUtils() {}
 
+    /** Alias for getCurrentUserId() */
+    public static Long getUserId() {
+        return getCurrentUserId();
+    }
+
     public static Long getCurrentUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.getPrincipal() instanceof LoginUser loginUser) {

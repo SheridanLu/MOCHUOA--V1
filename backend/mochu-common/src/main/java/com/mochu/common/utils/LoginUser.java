@@ -6,6 +6,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,9 @@ public class LoginUser implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (permissions == null || permissions.isEmpty()) {
+            return List.of();
+        }
         return permissions.stream()
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());

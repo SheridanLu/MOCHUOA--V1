@@ -12,4 +12,5 @@ public interface AuthService {
     void sendSmsCode(String phone);
     void logout();
     void resetPassword(String account, String smsCode, String newPassword);
+    LoginVO getCurrentUser();
 }

@@ -122,7 +122,7 @@ public class BizHrServiceImpl implements BizHrService {
             user.setPhone(dto.getPhone());
             user.setDeptId(dto.getDeptId());
             user.setStatus(1);
-            user.setPassword("$2a$10$defaultPasswordHash"); // Should be set properly
+            user.setPasswordHash("$2a$10$defaultPasswordHash"); // Should be set properly
             userMapper.insert(user);
             emp.setUserId(user.getId());
         }

@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import { useUserStore } from '@/stores/user'
+import { ElMessage } from 'element-plus'
 
 const routes = [
   {
@@ -142,7 +143,7 @@ const routes = [
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('@/views/common/NotFound.vue'),
-    meta: { title: '404' }
+    meta: { title: '404', requiresAuth: false }
   }
 ]
 
@@ -153,14 +154,38 @@ const router = createRouter({
 
 NProgress.configure({ showSpinner: false })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   NProgress.start()
   document.title = to.meta.title ? `${to.meta.title} - MOCHU-OA` : 'MOCHU-OA'
 
+  const userStore = useUserStore()
+
+  // Redirect authenticated users away from login
+  if (to.name === 'Login' && userStore.token) {
+    next({ path: '/' })
+    return
+  }
+
+  // Check if route requires auth
   if (to.meta.requiresAuth !== false) {
-    const userStore = useUserStore()
     if (!userStore.token) {
       next({ name: 'Login', query: { redirect: to.fullPath } })
+      return
+    }
+
+    // Re-fetch user info if token exists but userInfo is lost (page refresh)
+    if (!userStore.userInfo) {
+      const success = await userStore.fetchUserInfo()
+      if (!success) {
+        next({ name: 'Login', query: { redirect: to.fullPath } })
+        return
+      }
+    }
+
+    // Check route-level permission
+    if (to.meta.permission && !userStore.hasPermission(to.meta.permission)) {
+      ElMessage.error('您没有权限访问该页面')
+      next({ path: '/home' })
       return
     }
   }

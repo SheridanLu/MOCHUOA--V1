@@ -65,7 +65,7 @@ services:
       - minio_data:/data
     command: server /data --console-address ":9001"
     healthcheck:
-      test: ["CMD", "mc", "ready", "local"]
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -108,7 +108,7 @@ services:
         --minio.endpoint=http://minio:9000
         --xxl.job.admin.addresses=http://xxl-job-admin:8080/xxl-job-admin
     environment:
-      JAVA_OPTS: "-Xms512m -Xmx1024m"
+      JAVA_TOOL_OPTIONS: "-Xms512m -Xmx1024m"
       TZ: Asia/Shanghai
     depends_on:
       mysql:
@@ -116,7 +116,7 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:9090/api/v1/auth/check-account || exit 1"]
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/9090' 2>/dev/null || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5

@@ -35,7 +35,7 @@
           登录
         </el-button>
         <div class="login-links">
-          <el-link type="primary" @click="step = 1">返回</el-link>
+          <el-link type="primary" @click="goBack">返回</el-link>
           <el-link type="primary">忘记密码</el-link>
         </div>
       </div>
@@ -46,7 +46,7 @@
         <el-input v-model="smsCode" placeholder="请输入验证码" size="large" @keyup.enter="loginBySms">
           <template #prefix><el-icon><Message /></el-icon></template>
           <template #append>
-            <el-button :disabled="countdown > 0" @click="sendSms">
+            <el-button :disabled="countdown > 0 || smsLoading" @click="sendSms">
               {{ countdown > 0 ? `${countdown}s` : '获取验证码' }}
             </el-button>
           </template>
@@ -55,7 +55,7 @@
           登录
         </el-button>
         <div class="login-links">
-          <el-link type="primary" @click="step = 1">返回</el-link>
+          <el-link type="primary" @click="goBack">返回</el-link>
         </div>
       </div>
     </div>
@@ -63,7 +63,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
@@ -78,24 +78,50 @@ const account = ref('')
 const password = ref('')
 const smsCode = ref('')
 const loading = ref(false)
+const smsLoading = ref(false)
 const countdown = ref(0)
+let countdownTimer = null
+
+const goBack = () => {
+  step.value = 1
+  password.value = ''
+  smsCode.value = ''
+}
 
 const checkAccount = async () => {
-  if (!account.value) {
+  const trimmed = account.value.trim()
+  if (!trimmed) {
     ElMessage.warning('请输入用户名或手机号')
     return
   }
+  account.value = trimmed
   loading.value = true
   try {
-    const res = await checkAccountApi({ account: account.value })
+    const res = await checkAccountApi({ account: trimmed })
     if (!res.data.exists) {
       ElMessage.error('账号不存在')
       return
     }
     loginType.value = res.data.loginType
     step.value = 2
+  } catch (e) {
+    // Error already shown by interceptor
   } finally {
     loading.value = false
+  }
+}
+
+const handleLoginSuccess = (res) => {
+  userStore.setToken(res.data.token)
+  userStore.setUserInfo(res.data.userInfo)
+  userStore.setPermissions(res.data.permissions ? [...res.data.permissions] : [])
+  ElMessage.success('登录成功')
+  const redirect = router.currentRoute.value.query.redirect
+  // Validate redirect to prevent open redirect
+  if (redirect && redirect.startsWith('/') && !redirect.startsWith('//')) {
+    router.push(redirect)
+  } else {
+    router.push('/')
   }
 }
 
@@ -107,25 +133,32 @@ const loginByPassword = async () => {
   loading.value = true
   try {
     const res = await loginByPasswordApi({ account: account.value, password: password.value })
-    userStore.setToken(res.data.token)
-    userStore.setUserInfo(res.data.userInfo)
-    userStore.setPermissions([...res.data.permissions])
-    ElMessage.success('登录成功')
-    const redirect = router.currentRoute.value.query.redirect || '/'
-    router.push(redirect)
+    handleLoginSuccess(res)
+  } catch (e) {
+    // Error already shown by interceptor
   } finally {
     loading.value = false
   }
 }
 
 const sendSms = async () => {
-  await sendSmsCodeApi(account.value)
-  ElMessage.success('验证码已发送')
-  countdown.value = 60
-  const timer = setInterval(() => {
-    countdown.value--
-    if (countdown.value <= 0) clearInterval(timer)
-  }, 1000)
+  smsLoading.value = true
+  try {
+    await sendSmsCodeApi(account.value)
+    ElMessage.success('验证码已发送')
+    countdown.value = 60
+    countdownTimer = setInterval(() => {
+      countdown.value--
+      if (countdown.value <= 0) {
+        clearInterval(countdownTimer)
+        countdownTimer = null
+      }
+    }, 1000)
+  } catch (e) {
+    // Error already shown by interceptor
+  } finally {
+    smsLoading.value = false
+  }
 }
 
 const loginBySms = async () => {
@@ -136,16 +169,20 @@ const loginBySms = async () => {
   loading.value = true
   try {
     const res = await loginBySmsApi({ account: account.value, smsCode: smsCode.value })
-    userStore.setToken(res.data.token)
-    userStore.setUserInfo(res.data.userInfo)
-    userStore.setPermissions([...res.data.permissions])
-    ElMessage.success('登录成功')
-    const redirect = router.currentRoute.value.query.redirect || '/'
-    router.push(redirect)
+    handleLoginSuccess(res)
+  } catch (e) {
+    // Error already shown by interceptor
   } finally {
     loading.value = false
   }
 }
+
+onUnmounted(() => {
+  if (countdownTimer) {
+    clearInterval(countdownTimer)
+    countdownTimer = null
+  }
+})
 </script>
 
 <style scoped lang="scss">

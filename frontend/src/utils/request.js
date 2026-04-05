@@ -2,7 +2,7 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
 import router from '@/router'
-import { v4 as uuidv4 } from 'uuid'
+// Use native crypto.randomUUID() instead of uuid package
 
 const request = axios.create({
   baseURL: '/api/v1',
@@ -16,7 +16,7 @@ request.interceptors.request.use(config => {
   if (userStore.token) {
     config.headers.Authorization = `Bearer ${userStore.token}`
   }
-  config.headers['X-Request-Id'] = uuidv4()
+  config.headers['X-Request-Id'] = crypto.randomUUID()
   config.headers['X-Client-Type'] = 'pc'
   config.headers['X-Timestamp'] = Date.now().toString()
   return config
@@ -42,12 +42,13 @@ request.interceptors.response.use(
     const { response } = error
     if (response) {
       switch (response.status) {
-        case 401:
+        case 401: {
           ElMessage.error('登录已过期，请重新登录')
           const userStore = useUserStore()
           userStore.logout()
           router.push({ name: 'Login' })
           break
+        }
         case 403:
           ElMessage.error('您没有权限执行此操作')
           break

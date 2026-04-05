@@ -1,8 +1,8 @@
 package com.mochu.framework.aop;
 
 import com.mochu.common.utils.SecurityUtils;
-import com.mochu.system.entity.SysAuditLog;
-import com.mochu.system.mapper.SysAuditLogMapper;
+import com.mochu.common.audit.SysAuditLog;
+import com.mochu.common.audit.SysAuditLogMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

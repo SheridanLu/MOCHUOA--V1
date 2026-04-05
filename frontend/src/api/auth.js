@@ -20,6 +20,10 @@ export function logout() {
   return request.post('/auth/logout')
 }
 
+export function getUserInfo() {
+  return request.get('/auth/me')
+}
+
 export function resetPassword(data) {
   return request.post(`/auth/reset-password?account=${data.account}&smsCode=${data.smsCode}&newPassword=${data.newPassword}`)
 }
