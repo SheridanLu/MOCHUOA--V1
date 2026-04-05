@@ -105,6 +105,24 @@ const routes = [
         name: 'FinancePage',
         component: () => import('@/views/finance/FinancePage.vue'),
         meta: { title: '财务管理', permission: 'finance:view' }
+      },
+      {
+        path: 'completion',
+        name: 'CompletionPage',
+        component: () => import('@/views/completion/CompletionPage.vue'),
+        meta: { title: '竣工管理', permission: 'completion:view' }
+      },
+      {
+        path: 'announcements',
+        name: 'AnnouncementPage',
+        component: () => import('@/views/announcement/AnnouncementPage.vue'),
+        meta: { title: '通知公告', permission: 'announcement:view' }
+      },
+      {
+        path: 'showcases',
+        name: 'ShowcasePage',
+        component: () => import('@/views/showcase/ShowcasePage.vue'),
+        meta: { title: '案例展示', permission: 'showcase:view' }
       }
     ]
   },

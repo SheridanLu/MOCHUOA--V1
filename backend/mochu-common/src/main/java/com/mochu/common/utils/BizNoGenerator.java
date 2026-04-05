@@ -47,4 +47,6 @@ public class BizNoGenerator {
     public String generateSiteVisaNo() { return generate("VS", "yyMMdd", 3); }
     public String generateOwnerChangeNo() { return generate("CH", "yyMMdd", 3); }
     public String generateReceiptNo() { return generate("SK", "yyMMdd", 3); }
+    public String generateLaborSettlementNo() { return generate("LS", "yyMMdd", 3); }
+    public String generateCompletionReportNo() { return generate("JG", "yyMMdd", 3); }
 }

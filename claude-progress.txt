@@ -234,3 +234,58 @@
 
 ### 下一步工作
 - Phase 3: 竣工管理/通知系统/案例展示
+
+## 2026-04-05 - Phase 3 实现
+
+### 完成内容
+
+#### 竣工管理模块 (Features 180-184, 269-271, 305)
+- 后端: BizCompletionReport/Drawing/Settlement/LaborSettlement 实体(3个新建), 4个Mapper, CompletionReportDTO/DrawingUploadDTO/LaborSettlementCreateDTO/CompletionQueryDTO, CompletionReportVO/DrawingVO/SettlementVO/LaborSettlementVO/ArchiveVO
+- BizCompletionServiceImpl - 竣工全生命周期:
+  - 完工申请 (自动编号 JG+YYMMDD+3位, 完工前校验入库单全部审批完成 Feature 269)
+  - 竣工图纸批量上传 (≤10个, 同名图纸自动版本递增 Feature 182)
+  - 竣工图纸审批流 (Feature 270)
+  - 文档归档 (7类别: 合同/图纸/验收报告/结算/签证变更/质检/其他, 自动归集 Feature 183)
+  - 工程结算自动汇总变更成本 (Feature 271)
+  - 劳务结算创建审批 (编号 LS+YYMMDD+3位, Feature 305)
+- BizCompletionController - 15个REST端点
+
+#### 通知公告模块 (Features 185-188)
+- 后端: SysAnnouncement(已有) + BizMessageNotification(新建) 实体, 2个Mapper, AnnouncementCreateDTO, AnnouncementVO/NotificationVO
+- BizAnnouncementServiceImpl - 公告全模块:
+  - 3种公告类型 (通知/公告/制度文件)
+  - 定时发布 (publishAt字段, Feature 186)
+  - 公告下线 (状态变更, Feature 187)
+  - 部门范围发布 (deptScope, Feature 188)
+  - 站内消息通知 (发布时自动生成通知, 已读/未读/全部已读)
+- BizAnnouncementController - 8个REST端点
+
+#### 案例展示模块 (Features 189-192)
+- 后端: BizShowcase(已有) + BizShowcaseImage(新建) 实体, 2个Mapper, ShowcaseCreateDTO/ShowcaseQueryDTO, ShowcaseVO/ShowcaseImageVO
+- BizShowcaseServiceImpl - 案例全模块:
+  - 多媒体创建 (图片/视频链接/全景照片 Feature 189)
+  - 审批流 (提交→部门→GM Feature 190)
+  - 可见性控制 (公开/仅内部 Feature 191)
+  - 浏览次数统计 (view_count Feature 192)
+- BizShowcaseController - 7个REST端点
+
+#### 前端
+- 3个API模块: completion.js (14接口), announcement.js (8接口), showcase.js (7接口)
+- CompletionPage.vue (完工申请/图纸/归档/工程结算/劳务结算 五Tab页)
+- AnnouncementPage.vue (公告管理/消息通知 二Tab页, 含未读徽标)
+- ShowcasePage.vue (卡片网格展示, 详情弹窗, 审批/可见性控制)
+- 路由新增: /completion, /announcements, /showcases
+- MainLayout侧边栏新增: 竣工管理(Finished), 通知公告(Bell), 案例展示(Picture)
+
+#### 数据库
+- V4__phase3_additions.sql: biz_showcase增加view_count/visibility/video_url/panorama_url, sys_announcement增加status/dept_scope
+- BizNoGenerator: 新增generateLaborSettlementNo/generateCompletionReportNo
+
+### 文件统计
+- 新增后端文件: ~35个 (entity/mapper/dto/vo/service/controller)
+- 新增前端文件: 6个 (3 API + 3 页面)
+- 修改文件: 3个 (router, MainLayout, BizNoGenerator)
+- 新增SQL: V4__phase3_additions.sql
+
+### 下一步工作
+- Phase 4: 报表统计/审计日志
