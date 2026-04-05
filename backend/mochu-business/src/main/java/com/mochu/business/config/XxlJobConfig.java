@@ -3,6 +3,7 @@ package com.mochu.business.config;
 import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,6 +31,7 @@ public class XxlJobConfig {
     }
 
     @Bean
+    @ConditionalOnProperty(name = "xxl.job.enabled", havingValue = "true", matchIfMissing = false)
     public XxlJobSpringExecutor xxlJobExecutor() {
         log.info(">>>>>>>>>>> xxl-job config init: admin={}, appname={}", admin.getAddresses(), executor.getAppname());
         XxlJobSpringExecutor xxlJobSpringExecutor = new XxlJobSpringExecutor();

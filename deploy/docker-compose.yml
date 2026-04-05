@@ -106,6 +106,7 @@ services:
         --spring.data.redis.host=redis
         --spring.data.redis.password=mochu@2026
         --minio.endpoint=http://minio:9000
+        --xxl.job.enabled=false
         --xxl.job.admin.addresses=http://xxl-job-admin:8080/xxl-job-admin
     environment:
       JAVA_TOOL_OPTIONS: "-Xms512m -Xmx1024m"
