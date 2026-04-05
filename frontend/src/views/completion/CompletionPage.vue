@@ -57,7 +57,7 @@
           <el-table-column label="操作" width="180" fixed="right">
             <template #default="{ row }">
               <el-button link type="primary" v-permission="'completion:create'" @click="doUploadVersion(row)">上传新版</el-button>
-              <el-button link type="primary" @click="window.open(row.fileUrl)">下载</el-button>
+              <el-button link type="primary" @click="openFileUrl(row.fileUrl)">下载</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -80,7 +80,7 @@
                 <el-table-column prop="uploadedAt" label="时间" width="160" />
                 <el-table-column label="操作" width="100">
                   <template #default="{ row }">
-                    <el-button link type="primary" v-if="row.fileUrl" @click="window.open(row.fileUrl)">下载</el-button>
+                    <el-button link type="primary" v-if="row.fileUrl" @click="openFileUrl(row.fileUrl)">下载</el-button>
                   </template>
                 </el-table-column>
               </el-table>
@@ -244,6 +244,10 @@ const laborForm = reactive({ projectId: null, teamName: '', laborType: '', total
 
 const showApproveDialog = ref(false), approveComment = ref(''), isReject = ref(false)
 const approvingType = ref(''), approvingId = ref(null)
+
+const openFileUrl = (url) => {
+  if (url) window.open(url, '_blank', 'noopener,noreferrer')
+}
 
 const loadTab = () => {
   if (activeTab.value === 'report') loadReports()
