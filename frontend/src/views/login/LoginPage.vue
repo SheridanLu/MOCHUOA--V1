@@ -63,7 +63,7 @@
 </template>
 
 <script setup>
-import { ref, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
@@ -71,6 +71,10 @@ import { checkAccount as checkAccountApi, loginByPassword as loginByPasswordApi,
 
 const router = useRouter()
 const userStore = useUserStore()
+
+onMounted(() => {
+  console.log('[LoginPage] mounted, version=v1.1-fix')
+})
 
 const step = ref(1)
 const loginType = ref('password')
