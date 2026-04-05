@@ -289,3 +289,64 @@
 
 ### 下一步工作
 - Phase 4: 报表统计/审计日志
+
+## 2026-04-05 - Phase 4 实现
+
+### 完成内容
+
+#### 审计日志模块增强 (Features 193-200)
+- 后端: AuditLogAspect 升级为DB持久化 (原仅SLF4J日志)
+  - 从请求中提取IP (X-Forwarded-For/X-Real-IP/RemoteAddr)
+  - @AuditLog 注解新增 targetType 字段
+  - detail 截断至2000字符, 异常安全
+- AuditLogQueryDTO/AuditLogVO/AuditLogService/AuditLogServiceImpl/AuditLogController
+  - 多条件筛选 (userId, username模糊, module, action, targetType, 日期范围)
+  - Excel导出 (CSV格式, 最大10万行)
+  - JSON导出 (手动序列化)
+  - 8种操作类型: LOGIN/LOGOUT/CREATE/UPDATE/DELETE/APPROVE/REJECT/EXPORT
+- AuditLogController - 3个REST端点 (/api/v1/audit-logs)
+
+#### 报表统计模块 (Features 201-210)
+- 后端: BizReportSnapshot 实体, BizReportSnapshotMapper, ReportQueryDTO, ReportVO/CostSummaryVO/IncomeExpenseVO
+- BizReportServiceImpl - 4种报表:
+  - 项目成本汇总 (按成本类型聚合: 材料/人工/设备/管理/其他)
+  - 收支对比 (收入分解vs已付款, 利润率计算)
+  - 采购统计 (按项目汇总采购项数和金额)
+  - 库存统计 (按项目汇总物资种类和价值)
+  - 报表预计算快照 (JSON持久化到biz_report_snapshot)
+  - 缓存报表查询 (按类型筛选历史快照)
+- BizReportController - 7个REST端点 (/api/v1/reports, 含Excel导出)
+
+#### 前端
+- 2个API模块: audit.js (3接口), report.js (7接口)
+- AuditLogPage.vue (多条件搜索+日期范围+操作类型Tag+Excel/JSON导出+分页)
+- ReportPage.vue (成本/收支/采购/库存/快照 五Tab页, 含导出+预计算)
+- 路由新增: /reports, /audit-logs
+- MainLayout侧边栏新增: 报表统计(TrendCharts), 审计日志(List)
+
+#### 数据库
+- V5__phase4_additions.sql: biz_report_snapshot表, sys_audit_log增加target_type字段
+
+### 文件统计
+- 新增后端文件: ~15个 (entity/mapper/dto/vo/service/controller)
+- 新增前端文件: 4个 (2 API + 2 页面)
+- 修改文件: 3个 (router, MainLayout, AuditLogAspect)
+- 新增SQL: V5__phase4_additions.sql
+
+### 系统功能概览 (Phase 0-4 全部完成)
+- 系统管理: 用户/角色/权限/部门 CRUD + RBAC
+- 项目管理: 实体/虚拟项目全生命周期
+- 合同管理: 收入/支出合同+补充协议+模板
+- 供应商管理: CRUD + 评级
+- 通讯录: 部门联动 + 脱敏
+- 采购管理: 清单+基准价+审批
+- 物资管理: 入库/出库/退料/库存
+- 人力资源: 员工/薪资/报销/合同/资质
+- 施工进度: 计划/任务/偏差分析
+- 变更管理: 现场签证/业主变更/用工签证
+- 财务管理: 收入分解/对账/付款/收款/发票/成本
+- 竣工管理: 完工申请/图纸/归档/工程结算/劳务结算
+- 通知公告: 公告管理+站内消息
+- 案例展示: 多媒体+审批+可见性
+- 报表统计: 4类报表+预计算快照+导出
+- 审计日志: 多条件查询+Excel/JSON导出

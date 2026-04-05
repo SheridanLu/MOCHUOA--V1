@@ -81,6 +81,14 @@
           <el-icon><Picture /></el-icon>
           <span>案例展示</span>
         </el-menu-item>
+        <el-menu-item index="/reports" v-if="userStore.hasPermission('report:view')">
+          <el-icon><TrendCharts /></el-icon>
+          <span>报表统计</span>
+        </el-menu-item>
+        <el-menu-item index="/audit-logs" v-if="userStore.hasPermission('audit:view')">
+          <el-icon><List /></el-icon>
+          <span>审计日志</span>
+        </el-menu-item>
       </el-menu>
     </el-aside>
     <el-container>
@@ -115,7 +123,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessageBox } from 'element-plus'
-import { HomeFilled, Setting, Fold, Expand, Folder, Document, OfficeBuilding, User, ShoppingCart, Box, Avatar, DataLine, Switch, Money, Finished, Bell, Picture } from '@element-plus/icons-vue'
+import { HomeFilled, Setting, Fold, Expand, Folder, Document, OfficeBuilding, User, ShoppingCart, Box, Avatar, DataLine, Switch, Money, Finished, Bell, Picture, TrendCharts, List } from '@element-plus/icons-vue'
 import { logout as logoutApi } from '@/api/auth'
 
 const router = useRouter()

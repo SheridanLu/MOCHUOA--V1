@@ -123,6 +123,18 @@ const routes = [
         name: 'ShowcasePage',
         component: () => import('@/views/showcase/ShowcasePage.vue'),
         meta: { title: '案例展示', permission: 'showcase:view' }
+      },
+      {
+        path: 'reports',
+        name: 'ReportPage',
+        component: () => import('@/views/report/ReportPage.vue'),
+        meta: { title: '报表统计', permission: 'report:view' }
+      },
+      {
+        path: 'audit-logs',
+        name: 'AuditLogPage',
+        component: () => import('@/views/audit/AuditLogPage.vue'),
+        meta: { title: '审计日志', permission: 'audit:view' }
       }
     ]
   },
