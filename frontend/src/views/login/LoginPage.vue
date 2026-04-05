@@ -105,7 +105,7 @@ const checkAccount = async () => {
     loginType.value = res.data.loginType
     step.value = 2
   } catch (e) {
-    // Error already shown by interceptor
+    if (e && !e.response) ElMessage.error(e.message || '网络请求异常，请重试')
   } finally {
     loading.value = false
   }
@@ -135,7 +135,7 @@ const loginByPassword = async () => {
     const res = await loginByPasswordApi({ account: account.value, password: password.value })
     handleLoginSuccess(res)
   } catch (e) {
-    // Error already shown by interceptor
+    if (e && !e.response) ElMessage.error(e.message || '网络请求异常，请重试')
   } finally {
     loading.value = false
   }
@@ -155,7 +155,7 @@ const sendSms = async () => {
       }
     }, 1000)
   } catch (e) {
-    // Error already shown by interceptor
+    if (e && !e.response) ElMessage.error(e.message || '发送失败，请重试')
   } finally {
     smsLoading.value = false
   }
@@ -171,7 +171,7 @@ const loginBySms = async () => {
     const res = await loginBySmsApi({ account: account.value, smsCode: smsCode.value })
     handleLoginSuccess(res)
   } catch (e) {
-    // Error already shown by interceptor
+    if (e && !e.response) ElMessage.error(e.message || '网络请求异常，请重试')
   } finally {
     loading.value = false
   }

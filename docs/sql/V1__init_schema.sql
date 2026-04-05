@@ -1301,7 +1301,7 @@ INSERT INTO `sys_department` (`id`, `dept_name`, `parent_id`, `path`, `sort_orde
 -- 3.2 Admin user  (BCrypt hash of 'Admin@2026')
 -- -----------------------------------------------------------
 INSERT INTO `sys_user` (`id`, `username`, `password_hash`, `real_name`, `phone`, `dept_id`, `status`) VALUES
-(1, 'admin', '$2b$10$B17IelFvQW28KAx1nmkF3uJpGCOf4WTvqfa9RFEAWJ.Ml26VLmqVW', '系统管理员', '13800000000', 1, 1);
+(1, 'admin', '$2a$10$B17IelFvQW28KAx1nmkF3uJpGCOf4WTvqfa9RFEAWJ.Ml26VLmqVW', '系统管理员', '13800000000', 1, 1);
 
 -- -----------------------------------------------------------
 -- 3.3 Roles

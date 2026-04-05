@@ -2,7 +2,25 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
 import router from '@/router'
-// Use native crypto.randomUUID() instead of uuid package
+
+function generateRequestId() {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    try {
+      return crypto.randomUUID()
+    } catch (_) { /* insecure context, fall through */ }
+  }
+  // Fallback: works in all contexts including HTTP
+  const buf = new Uint8Array(16)
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    crypto.getRandomValues(buf)
+  } else {
+    for (let i = 0; i < 16; i++) buf[i] = (Math.random() * 256) | 0
+  }
+  buf[6] = (buf[6] & 0x0f) | 0x40
+  buf[8] = (buf[8] & 0x3f) | 0x80
+  const hex = Array.from(buf, b => b.toString(16).padStart(2, '0')).join('')
+  return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`
+}
 
 const request = axios.create({
   baseURL: '/api/v1',
@@ -16,7 +34,7 @@ request.interceptors.request.use(config => {
   if (userStore.token) {
     config.headers.Authorization = `Bearer ${userStore.token}`
   }
-  config.headers['X-Request-Id'] = crypto.randomUUID()
+  config.headers['X-Request-Id'] = generateRequestId()
   config.headers['X-Client-Type'] = 'pc'
   config.headers['X-Timestamp'] = Date.now().toString()
   return config
