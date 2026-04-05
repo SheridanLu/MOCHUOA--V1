@@ -116,11 +116,11 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:9090/api/v1/auth/health || exit 1"]
+      test: ["CMD", "curl", "-sf", "http://localhost:9090/api/v1/auth/health"]
       interval: 30s
       timeout: 10s
-      retries: 5
-      start_period: 90s
+      retries: 10
+      start_period: 120s
     networks:
       - mochu-net
 
