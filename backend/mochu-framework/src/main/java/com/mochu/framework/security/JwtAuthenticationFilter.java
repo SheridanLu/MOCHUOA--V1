@@ -30,34 +30,40 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        String token = resolveToken(request);
-        if (token != null && jwtUtils.validateToken(token)) {
-            Long userId = jwtUtils.getUserIdFromToken(token);
-            String clientType = jwtUtils.getClientTypeFromToken(token);
-            String redisKey = Constants.REDIS_TOKEN_PREFIX + userId + ":" + clientType;
-            String storedToken = redisTemplate.opsForValue().get(redisKey);
+        try {
+            String token = resolveToken(request);
+            if (token != null && jwtUtils.validateToken(token)) {
+                Long userId = jwtUtils.getUserIdFromToken(token);
+                String clientType = jwtUtils.getClientTypeFromToken(token);
+                String redisKey = Constants.REDIS_TOKEN_PREFIX + userId + ":" + clientType;
+                String storedToken = redisTemplate.opsForValue().get(redisKey);
 
-            if (token.equals(storedToken)) {
-                String permKey = Constants.REDIS_PERMISSIONS_PREFIX + userId;
-                Set<String> permissions = redisTemplate.opsForSet().members(permKey);
+                if (token.equals(storedToken)) {
+                    String permKey = Constants.REDIS_PERMISSIONS_PREFIX + userId;
+                    Set<String> permissions = redisTemplate.opsForSet().members(permKey);
 
-                LoginUser loginUser = new LoginUser();
-                loginUser.setUserId(userId);
-                loginUser.setUsername(jwtUtils.getUsernameFromToken(token));
-                loginUser.setClientType(clientType);
-                loginUser.setPermissions(permissions != null ? permissions : Set.of());
-                loginUser.setStatus(1);
+                    LoginUser loginUser = new LoginUser();
+                    loginUser.setUserId(userId);
+                    loginUser.setUsername(jwtUtils.getUsernameFromToken(token));
+                    loginUser.setClientType(clientType);
+                    loginUser.setPermissions(permissions != null ? permissions : Set.of());
+                    loginUser.setStatus(1);
 
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(loginUser, null, loginUser.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(loginUser, null, loginUser.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                if (jwtUtils.shouldRefreshToken(token)) {
-                    String newToken = jwtUtils.generateToken(userId, loginUser.getUsername(), clientType);
-                    redisTemplate.opsForValue().set(redisKey, newToken, 30, TimeUnit.DAYS);
-                    response.setHeader("X-New-Token", newToken);
+                    if (jwtUtils.shouldRefreshToken(token)) {
+                        String newToken = jwtUtils.generateToken(userId, loginUser.getUsername(), clientType);
+                        redisTemplate.opsForValue().set(redisKey, newToken, 30, TimeUnit.DAYS);
+                        response.setHeader("X-New-Token", newToken);
+                    }
                 }
             }
+        } catch (Exception e) {
+            log.warn("JWT 认证过滤器异常，跳过认证继续处理请求: {}", e.getMessage());
+            // 不要抛出异常，让请求继续。对于 permitAll 的端点（如登录），无需认证即可通过。
+            // 对于需要认证的端点，SecurityContext 中没有认证信息，Spring Security 会返回 401。
         }
         chain.doFilter(request, response);
     }
