@@ -88,6 +88,11 @@ const goBack = () => {
   smsCode.value = ''
 }
 
+const showError = (e) => {
+  const msg = e?.response?.data?.message || e?.message || '网络请求异常，请重试'
+  if (msg) ElMessage.error(msg)
+}
+
 const checkAccount = async () => {
   const trimmed = account.value.trim()
   if (!trimmed) {
@@ -105,7 +110,8 @@ const checkAccount = async () => {
     loginType.value = res.data.loginType
     step.value = 2
   } catch (e) {
-    if (e && !e.response) ElMessage.error(e.message || '网络请求异常，请重试')
+    console.error('[checkAccount]', e)
+    showError(e)
   } finally {
     loading.value = false
   }
@@ -117,11 +123,10 @@ const handleLoginSuccess = (res) => {
   userStore.setPermissions(res.data.permissions ? [...res.data.permissions] : [])
   ElMessage.success('登录成功')
   const redirect = router.currentRoute.value.query.redirect
-  // Validate redirect to prevent open redirect
   if (redirect && redirect.startsWith('/') && !redirect.startsWith('//')) {
     router.push(redirect)
   } else {
-    router.push('/')
+    router.push('/home')
   }
 }
 
@@ -135,7 +140,8 @@ const loginByPassword = async () => {
     const res = await loginByPasswordApi({ account: account.value, password: password.value })
     handleLoginSuccess(res)
   } catch (e) {
-    if (e && !e.response) ElMessage.error(e.message || '网络请求异常，请重试')
+    console.error('[loginByPassword]', e)
+    showError(e)
   } finally {
     loading.value = false
   }
@@ -155,7 +161,8 @@ const sendSms = async () => {
       }
     }, 1000)
   } catch (e) {
-    if (e && !e.response) ElMessage.error(e.message || '发送失败，请重试')
+    console.error('[sendSms]', e)
+    showError(e)
   } finally {
     smsLoading.value = false
   }
@@ -171,7 +178,8 @@ const loginBySms = async () => {
     const res = await loginBySmsApi({ account: account.value, smsCode: smsCode.value })
     handleLoginSuccess(res)
   } catch (e) {
-    if (e && !e.response) ElMessage.error(e.message || '网络请求异常，请重试')
+    console.error('[loginBySms]', e)
+    showError(e)
   } finally {
     loading.value = false
   }
